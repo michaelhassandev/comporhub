@@ -11,7 +11,7 @@
             </div>
             
             <div class="card-body">
-                <form method="POST" action="">
+                <form method="POST" action="" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
                     
                     <div class="row mb-3">
@@ -72,6 +72,23 @@
                         {% endif %}
                         <div class="form-text">
                             Adicione detalhes sobre sua composição como inspiração, técnicas usadas, instrumentos, etc.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.audio_file.label(class="form-label") }}
+                        {% if form.audio_file.errors %}
+                            {{ form.audio_file(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.audio_file.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.audio_file(class="form-control") }}
+                        {% endif %}
+                        <div class="form-text">
+                            Upload apenas de arquivos MP3. Tamanho máximo: 3MB.
                         </div>
                     </div>
                     

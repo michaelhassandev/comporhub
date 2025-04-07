@@ -45,7 +45,7 @@
                         </span>
                     </div>
                     
-                    <div class="description-section">
+                    <div class="description-section mb-4">
                         <h5 class="text-neon-green mb-3">Descrição</h5>
                         <div class="description-content">
                             {% if composition.description %}
@@ -54,6 +54,24 @@
                                 <p class="text-muted fst-italic">Sem descrição.</p>
                             {% endif %}
                         </div>
+                    </div>
+                    
+                    <div class="audio-section">
+                        <h5 class="text-neon-green mb-3">Arquivo de Áudio</h5>
+                        {% if composition.audio_file %}
+                            <div class="audio-player-container mb-3">
+                                <audio controls class="w-100">
+                                    <source src="{{ url_for('main.get_audio', composition_id=composition.id) }}" type="audio/mpeg">
+                                    Seu navegador não suporta o elemento de áudio.
+                                </audio>
+                            </div>
+                            <div class="audio-info text-muted small">
+                                <i class="fas fa-info-circle me-1"></i> 
+                                Tamanho do arquivo: {{ (composition.audio_file_size / 1024)|round|int }} KB
+                            </div>
+                        {% else %}
+                            <p class="text-muted fst-italic">Nenhum arquivo de áudio disponível.</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>

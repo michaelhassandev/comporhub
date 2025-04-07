@@ -1,12 +1,44 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, current_app, send_file
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from models import User, Composition, Genre
 from forms import RegistrationForm, LoginForm, CompositionForm, GenreForm, UserAdminForm
 from sqlalchemy import desc
 from functools import wraps
+import os
+from werkzeug.utils import secure_filename
+import uuid
 
 bp = Blueprint('main', __name__)
+
+# Configurações para upload de arquivos
+UPLOAD_FOLDER = 'static/uploads/audio'
+ALLOWED_EXTENSIONS = {'mp3'}
+MAX_CONTENT_LENGTH = 3 * 1024 * 1024  # 3MB em bytes
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_audio_file(file):
+    """Salva um arquivo de áudio e retorna o caminho relativo."""
+    if file and allowed_file(file.filename):
+        # Criar nome de arquivo seguro e único
+        filename = secure_filename(file.filename)
+        # Adicionar um identificador único para evitar sobrescrever arquivos
+        unique_filename = f"{uuid.uuid4().hex}_{filename}"
+        
+        # Garantir que o diretório existe
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        
+        # Caminho completo para salvar o arquivo
+        filepath = os.path.join(UPLOAD_FOLDER, unique_filename)
+        
+        # Salvar o arquivo
+        file.save(filepath)
+        
+        # Retornar caminho relativo para armazenar no banco de dados
+        return filepath, file.content_length
+    return None, 0
 
 # Decorador para verificar se o usuário é administrador
 def admin_required(f):
@@ -96,6 +128,22 @@ def new_composition():
                 composition.genre = genre_obj.name
                 composition.genre_id = genre_obj.id
         
+        # Verificar se há um arquivo de áudio sendo enviado
+        audio_file = form.audio_file.data
+        if audio_file:
+            if audio_file.content_length > MAX_CONTENT_LENGTH:
+                flash('Arquivo de áudio excede o limite de 3MB!', 'danger')
+                return render_template('composition_form.html', form=form, title='Nova Composição')
+            
+            # Salvar o arquivo e obter o caminho relativo
+            filepath, file_size = save_audio_file(audio_file)
+            if filepath:
+                composition.audio_file = filepath
+                composition.audio_file_size = file_size
+            else:
+                flash('Tipo de arquivo não permitido. Use apenas arquivos MP3.', 'danger')
+                return render_template('composition_form.html', form=form, title='Nova Composição')
+        
         db.session.add(composition)
         db.session.commit()
         flash('Sua composição foi criada!', 'success')
@@ -110,6 +158,22 @@ def composition_detail(composition_id):
     if composition.user_id != current_user.id:
         abort(403)
     return render_template('composition_detail.html', composition=composition)
+
+@bp.route('/audio/<int:composition_id>')
+@login_required
+def get_audio(composition_id):
+    composition = Composition.query.get_or_404(composition_id)
+    
+    # Verificar se o usuário tem permissão para acessar
+    if composition.user_id != current_user.id and not current_user.is_admin:
+        abort(403)
+    
+    # Verificar se a composição tem um arquivo de áudio
+    if not composition.audio_file or not os.path.exists(composition.audio_file):
+        abort(404)
+    
+    # Retornar o arquivo de áudio
+    return send_file(composition.audio_file, mimetype='audio/mpeg')
 
 @bp.route('/composition/<int:composition_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -134,6 +198,30 @@ def edit_composition(composition_id):
         else:
             composition.genre = None
             composition.genre_id = None
+        
+        # Verificar se há um novo arquivo de áudio sendo enviado
+        audio_file = form.audio_file.data
+        if audio_file:
+            if audio_file.content_length > MAX_CONTENT_LENGTH:
+                flash('Arquivo de áudio excede o limite de 3MB!', 'danger')
+                return render_template('composition_form.html', form=form, title='Editar Composição')
+            
+            # Remover arquivo antigo se existir
+            if composition.audio_file and os.path.exists(composition.audio_file):
+                try:
+                    os.remove(composition.audio_file)
+                except Exception as e:
+                    # Apenas log, não impedir a atualização
+                    print(f"Erro ao excluir arquivo antigo: {e}")
+            
+            # Salvar o novo arquivo e obter o caminho relativo
+            filepath, file_size = save_audio_file(audio_file)
+            if filepath:
+                composition.audio_file = filepath
+                composition.audio_file_size = file_size
+            else:
+                flash('Tipo de arquivo não permitido. Use apenas arquivos MP3.', 'danger')
+                return render_template('composition_form.html', form=form, title='Editar Composição')
             
         db.session.commit()
         flash('Sua composição foi atualizada!', 'success')
@@ -160,6 +248,14 @@ def delete_composition(composition_id):
     composition = Composition.query.get_or_404(composition_id)
     if composition.user_id != current_user.id:
         abort(403)
+    
+    # Remover arquivo de áudio se existir
+    if composition.audio_file and os.path.exists(composition.audio_file):
+        try:
+            os.remove(composition.audio_file)
+        except Exception as e:
+            # Apenas log, não impedir a exclusão da composição
+            print(f"Erro ao excluir arquivo de áudio: {e}")
     
     db.session.delete(composition)
     db.session.commit()

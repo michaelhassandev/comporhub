@@ -41,6 +41,8 @@ class Composition(db.Model):
     description = db.Column(db.Text)
     genre = db.Column(db.String(50))  # Manter para compatibilidade
     genre_id = db.Column(db.Integer, db.ForeignKey('genre.id'))  # Nova relação com tabela de gêneros
+    audio_file = db.Column(db.String(255))  # Caminho para o arquivo de áudio
+    audio_file_size = db.Column(db.Integer)  # Tamanho do arquivo em bytes
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

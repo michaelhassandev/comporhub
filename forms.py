@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import StringField, PasswordField, TextAreaField, SubmitField, SelectField, BooleanField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from models import User, Genre
@@ -30,6 +31,11 @@ class CompositionForm(FlaskForm):
     music_name = StringField('Nome da Música', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Descrição')
     genre = SelectField('Gênero', choices=[])  # Será preenchido dinamicamente
+    audio_file = FileField('Arquivo de Áudio (MP3, máx. 3MB)', 
+                          validators=[
+                              FileAllowed(['mp3'], 'Apenas arquivos MP3 são permitidos!'),
+                              # FileRequired() não é obrigatório para permitir edição sem alterar o arquivo
+                          ])
     submit = SubmitField('Salvar Composição')
     
     def __init__(self, *args, **kwargs):

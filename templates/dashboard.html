@@ -42,6 +42,11 @@
                                 <i class="far fa-calendar-alt me-1"></i>
                                 {{ composition.created_at.strftime('%d/%m/%Y') }}
                             </span>
+                            {% if composition.audio_file %}
+                                <span class="badge bg-neon-pink">
+                                    <i class="fas fa-music me-1"></i>Áudio
+                                </span>
+                            {% endif %}
                         </div>
 
                         <p class="description-preview">
