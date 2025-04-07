@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Composer Hub{% endblock %}
+{% block title %}Painel - Hub do Compositor{% endblock %}
 
 {% block content %}
 <div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
-    <h1 class="text-white">My Compositions</h1>
+    <h1 class="text-white">Minhas Composições</h1>
     <a href="{{ url_for('main.new_composition') }}" class="btn btn-neon-green">
-        <i class="fas fa-plus me-2"></i>New Composition
+        <i class="fas fa-plus me-2"></i>Nova Composição
     </a>
 </div>
 
@@ -16,7 +16,7 @@
             type="text" 
             name="q" 
             class="form-control me-2" 
-            placeholder="Search compositions..." 
+            placeholder="Buscar composições..." 
             value="{{ search_query if search_query else '' }}"
         >
         <button type="submit" class="btn btn-neon-pink">
@@ -40,17 +40,17 @@
                             {% endif %}
                             <span class="badge bg-secondary">
                                 <i class="far fa-calendar-alt me-1"></i>
-                                {{ composition.created_at.strftime('%b %d, %Y') }}
+                                {{ composition.created_at.strftime('%d/%m/%Y') }}
                             </span>
                         </div>
 
                         <p class="description-preview">
-                            {{ composition.description[:100] ~ '...' if composition.description and composition.description|length > 100 else composition.description or 'No description provided.' }}
+                            {{ composition.description[:100] ~ '...' if composition.description and composition.description|length > 100 else composition.description or 'Sem descrição.' }}
                         </p>
 
                         <div class="d-flex justify-content-between mt-3">
                             <a href="{{ url_for('main.composition_detail', composition_id=composition.id) }}" class="btn btn-sm btn-outline-light">
-                                <i class="fas fa-eye me-1"></i>View
+                                <i class="fas fa-eye me-1"></i>Ver
                             </a>
                             <div>
                                 <a href="{{ url_for('main.edit_composition', composition_id=composition.id) }}" class="btn btn-sm btn-outline-light me-1">
@@ -73,16 +73,16 @@
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Confirm Deletion</h5>
+                                <h5 class="modal-title">Confirmar Exclusão</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                Are you sure you want to delete "{{ composition.title }}"? This action cannot be undone.
+                                Tem certeza que deseja excluir "{{ composition.title }}"? Esta ação não pode ser desfeita.
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                 <form action="{{ url_for('main.delete_composition', composition_id=composition.id) }}" method="POST">
-                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                    <button type="submit" class="btn btn-danger">Excluir</button>
                                 </form>
                             </div>
                         </div>
@@ -103,16 +103,16 @@
         </svg>
         
         {% if search_query %}
-            <h3 class="text-white">No compositions found matching "{{ search_query }}"</h3>
-            <p class="text-muted">Try a different search query or clear your search</p>
+            <h3 class="text-white">Nenhuma composição encontrada para "{{ search_query }}"</h3>
+            <p class="text-muted">Tente uma busca diferente ou limpe sua pesquisa</p>
             <a href="{{ url_for('main.dashboard') }}" class="btn btn-neon-green mt-2">
-                <i class="fas fa-times me-2"></i>Clear Search
+                <i class="fas fa-times me-2"></i>Limpar Busca
             </a>
         {% else %}
-            <h3 class="text-white">You don't have any compositions yet</h3>
-            <p class="text-muted">Start creating your musical portfolio today!</p>
+            <h3 class="text-white">Você ainda não tem nenhuma composição</h3>
+            <p class="text-muted">Comece a criar seu portfólio musical hoje!</p>
             <a href="{{ url_for('main.new_composition') }}" class="btn btn-neon-pink mt-3">
-                <i class="fas fa-plus me-2"></i>Create Your First Composition
+                <i class="fas fa-plus me-2"></i>Criar Sua Primeira Composição
             </a>
         {% endif %}
     </div>

@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Composer Hub - Manage Your Musical Compositions{% endblock %}
+{% block title %}Hub do Compositor - Gerencie Suas Composições Musicais{% endblock %}
 
 {% block content %}
 <div class="row align-items-center py-5">
     <div class="col-lg-6">
-        <h1 class="display-4 fw-bold text-white">Your Music, <span class="text-neon-green">Organized</span></h1>
-        <p class="lead text-white">A platform for composers to store, manage, and organize their musical compositions in one place.</p>
+        <h1 class="display-4 fw-bold text-white">Sua Música, <span class="text-neon-green">Organizada</span></h1>
+        <p class="lead text-white">Uma plataforma para compositores armazenar, gerenciar e organizar suas composições musicais em um só lugar.</p>
         <div class="d-flex flex-wrap gap-2 mt-4">
             {% if current_user.is_authenticated %}
-                <a href="{{ url_for('main.dashboard') }}" class="btn btn-neon-green btn-lg">Go to Dashboard</a>
-                <a href="{{ url_for('main.new_composition') }}" class="btn btn-neon-pink btn-lg">Create New Composition</a>
+                <a href="{{ url_for('main.dashboard') }}" class="btn btn-neon-green btn-lg">Ir para o Painel</a>
+                <a href="{{ url_for('main.new_composition') }}" class="btn btn-neon-pink btn-lg">Criar Nova Composição</a>
             {% else %}
-                <a href="{{ url_for('main.register') }}" class="btn btn-neon-green btn-lg">Get Started</a>
-                <a href="{{ url_for('main.login') }}" class="btn btn-outline-light btn-lg">Login</a>
+                <a href="{{ url_for('main.register') }}" class="btn btn-neon-green btn-lg">Começar</a>
+                <a href="{{ url_for('main.login') }}" class="btn btn-outline-light btn-lg">Entrar</a>
             {% endif %}
         </div>
     </div>
@@ -63,39 +63,39 @@
 </div>
 
 <div class="row my-5 text-center text-white">
-    <h2 class="mb-4">Why Choose <span class="text-neon-pink">Composer Hub</span>?</h2>
+    <h2 class="mb-4">Por que escolher o <span class="text-neon-pink">Hub do Compositor</span>?</h2>
     
     <div class="col-md-4 mb-4">
         <div class="feature-card">
             <i class="fas fa-music fa-3x mb-3 text-neon-green"></i>
-            <h3>Organize Your Compositions</h3>
-            <p>Keep all your musical works in one place with detailed information and easy searching.</p>
+            <h3>Organize Suas Composições</h3>
+            <p>Mantenha todas as suas obras musicais em um só lugar com informações detalhadas e busca fácil.</p>
         </div>
     </div>
     
     <div class="col-md-4 mb-4">
         <div class="feature-card">
             <i class="fas fa-tasks fa-3x mb-3 text-neon-pink"></i>
-            <h3>Track Your Progress</h3>
-            <p>Monitor your creative journey and see how your composition portfolio grows over time.</p>
+            <h3>Acompanhe Seu Progresso</h3>
+            <p>Monitore sua jornada criativa e veja como seu portfólio de composições cresce ao longo do tempo.</p>
         </div>
     </div>
     
     <div class="col-md-4 mb-4">
         <div class="feature-card">
             <i class="fas fa-mobile-alt fa-3x mb-3 text-neon-green"></i>
-            <h3>Access Anywhere</h3>
-            <p>Our responsive design allows you to manage your compositions from any device.</p>
+            <h3>Acesse de Qualquer Lugar</h3>
+            <p>Nosso design responsivo permite gerenciar suas composições a partir de qualquer dispositivo.</p>
         </div>
     </div>
 </div>
 
 <div class="text-center mt-5 mb-3">
-    <h2 class="text-white">Ready to organize your musical creations?</h2>
+    <h2 class="text-white">Pronto para organizar suas criações musicais?</h2>
     {% if not current_user.is_authenticated %}
-    <a href="{{ url_for('main.register') }}" class="btn btn-neon-pink btn-lg mt-3">Join Now</a>
+    <a href="{{ url_for('main.register') }}" class="btn btn-neon-pink btn-lg mt-3">Junte-se Agora</a>
     {% else %}
-    <a href="{{ url_for('main.dashboard') }}" class="btn btn-neon-green btn-lg mt-3">Go to Your Dashboard</a>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-neon-green btn-lg mt-3">Ir para Seu Painel</a>
     {% endif %}
 </div>
 {% endblock %}

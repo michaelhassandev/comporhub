@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}{{ composition.title }} - Composer Hub{% endblock %}
+{% block title %}{{ composition.title }} - Hub do Compositor{% endblock %}
 
 {% block content %}
 <div class="composition-detail">
     <div class="detail-header mb-4">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('main.dashboard') }}">My Compositions</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('main.dashboard') }}">Minhas Composições</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ composition.title }}</li>
             </ol>
         </nav>
@@ -15,10 +15,10 @@
             <h1 class="text-white mb-0">{{ composition.title }}</h1>
             <div class="btn-group">
                 <a href="{{ url_for('main.edit_composition', composition_id=composition.id) }}" class="btn btn-neon-green">
-                    <i class="fas fa-edit me-2"></i>Edit
+                    <i class="fas fa-edit me-2"></i>Editar
                 </a>
                 <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                    <i class="fas fa-trash me-2"></i>Delete
+                    <i class="fas fa-trash me-2"></i>Excluir
                 </button>
             </div>
         </div>
@@ -38,20 +38,20 @@
                             <span class="badge bg-neon-green mb-2 me-2">{{ composition.genre }}</span>
                         {% endif %}
                         <span class="badge bg-secondary mb-2 me-2">
-                            <i class="far fa-calendar-alt me-1"></i> Created: {{ composition.created_at.strftime('%b %d, %Y') }}
+                            <i class="far fa-calendar-alt me-1"></i> Criado em: {{ composition.created_at.strftime('%d/%m/%Y') }}
                         </span>
                         <span class="badge bg-secondary mb-2">
-                            <i class="fas fa-clock me-1"></i> Updated: {{ composition.updated_at.strftime('%b %d, %Y') }}
+                            <i class="fas fa-clock me-1"></i> Atualizado em: {{ composition.updated_at.strftime('%d/%m/%Y') }}
                         </span>
                     </div>
                     
                     <div class="description-section">
-                        <h5 class="text-neon-green mb-3">Description</h5>
+                        <h5 class="text-neon-green mb-3">Descrição</h5>
                         <div class="description-content">
                             {% if composition.description %}
                                 {{ composition.description | nl2br }}
                             {% else %}
-                                <p class="text-muted fst-italic">No description provided.</p>
+                                <p class="text-muted fst-italic">Sem descrição.</p>
                             {% endif %}
                         </div>
                     </div>
@@ -62,27 +62,27 @@
         <div class="col-lg-4">
             <div class="card bg-dark info-card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title text-neon-pink"><i class="fas fa-info-circle me-2"></i>Composition Info</h5>
+                    <h5 class="card-title text-neon-pink"><i class="fas fa-info-circle me-2"></i>Informações da Composição</h5>
                     <ul class="list-group list-group-flush bg-transparent">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span class="fw-bold">Title:</span>
+                            <span class="fw-bold">Título:</span>
                             <span>{{ composition.title }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span class="fw-bold">Music Name:</span>
+                            <span class="fw-bold">Nome da Música:</span>
                             <span>{{ composition.music_name }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span class="fw-bold">Genre:</span>
-                            <span>{{ composition.genre or 'Not specified' }}</span>
+                            <span class="fw-bold">Gênero:</span>
+                            <span>{{ composition.genre or 'Não especificado' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span class="fw-bold">Created:</span>
-                            <span>{{ composition.created_at.strftime('%b %d, %Y') }}</span>
+                            <span class="fw-bold">Criado em:</span>
+                            <span>{{ composition.created_at.strftime('%d/%m/%Y') }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span class="fw-bold">Last Updated:</span>
-                            <span>{{ composition.updated_at.strftime('%b %d, %Y') }}</span>
+                            <span class="fw-bold">Última Atualização:</span>
+                            <span>{{ composition.updated_at.strftime('%d/%m/%Y') }}</span>
                         </li>
                     </ul>
                 </div>
@@ -96,16 +96,16 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Confirm Deletion</h5>
+                <h5 class="modal-title">Confirmar Exclusão</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete "{{ composition.title }}"? This action cannot be undone.
+                Tem certeza que deseja excluir "{{ composition.title }}"? Esta ação não pode ser desfeita.
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <form action="{{ url_for('main.delete_composition', composition_id=composition.id) }}" method="POST">
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger">Excluir</button>
                 </form>
             </div>
         </div>

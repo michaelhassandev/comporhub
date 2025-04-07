@@ -22,7 +22,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Your account has been created! You can now log in.', 'success')
+        flash('Sua conta foi criada! Agora você pode entrar.', 'success')
         return redirect(url_for('main.login'))
     
     return render_template('register.html', form=form)
@@ -38,10 +38,10 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user)
             next_page = request.args.get('next')
-            flash('You have been logged in successfully!', 'success')
+            flash('Você entrou com sucesso!', 'success')
             return redirect(next_page or url_for('main.dashboard'))
         else:
-            flash('Login failed. Please check your email and password.', 'danger')
+            flash('Falha ao entrar. Verifique seu email e senha.', 'danger')
     
     return render_template('login.html', form=form)
 
@@ -49,7 +49,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out.', 'info')
+    flash('Você saiu da sua conta.', 'info')
     return redirect(url_for('main.home'))
 
 @bp.route('/dashboard')
@@ -72,10 +72,10 @@ def new_composition():
         )
         db.session.add(composition)
         db.session.commit()
-        flash('Your composition has been created!', 'success')
+        flash('Sua composição foi criada!', 'success')
         return redirect(url_for('main.dashboard'))
     
-    return render_template('composition_form.html', form=form, title='New Composition')
+    return render_template('composition_form.html', form=form, title='Nova Composição')
 
 @bp.route('/composition/<int:composition_id>')
 @login_required
@@ -99,7 +99,7 @@ def edit_composition(composition_id):
         composition.description = form.description.data
         composition.genre = form.genre.data
         db.session.commit()
-        flash('Your composition has been updated!', 'success')
+        flash('Sua composição foi atualizada!', 'success')
         return redirect(url_for('main.composition_detail', composition_id=composition.id))
     elif request.method == 'GET':
         form.title.data = composition.title
@@ -107,7 +107,7 @@ def edit_composition(composition_id):
         form.description.data = composition.description
         form.genre.data = composition.genre
     
-    return render_template('composition_form.html', form=form, title='Edit Composition')
+    return render_template('composition_form.html', form=form, title='Editar Composição')
 
 @bp.route('/composition/<int:composition_id>/delete', methods=['POST'])
 @login_required
@@ -118,7 +118,7 @@ def delete_composition(composition_id):
     
     db.session.delete(composition)
     db.session.commit()
-    flash('Your composition has been deleted!', 'success')
+    flash('Sua composição foi excluída!', 'success')
     return redirect(url_for('main.dashboard'))
 
 @bp.route('/search', methods=['GET'])
