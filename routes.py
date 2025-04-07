@@ -1,84 +1,97 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, current_app, send_file
-from flask_login import login_user, logout_user, login_required, current_user
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, send_file
+from flask_login import login_user, current_user, logout_user, login_required
+from datetime import datetime, timedelta
+import os
+import uuid
+from sqlalchemy import desc
+from werkzeug.utils import secure_filename
+import werkzeug
+
 from app import db
 from models import User, Composition, Genre
 from forms import RegistrationForm, LoginForm, CompositionForm, GenreForm, UserAdminForm
-from sqlalchemy import desc
-from functools import wraps
-import os
-from werkzeug.utils import secure_filename
-import uuid
 
+# Criar um blueprint para todas as rotas
 bp = Blueprint('main', __name__)
 
-# Configurações para upload de arquivos
-UPLOAD_FOLDER = 'static/uploads/audio'
-ALLOWED_EXTENSIONS = {'mp3'}
+# Tamanho máximo para arquivos de upload (3MB)
 MAX_CONTENT_LENGTH = 3 * 1024 * 1024  # 3MB em bytes
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    """Verifica se o arquivo tem uma extensão permitida."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['mp3']
 
 def save_audio_file(file):
     """Salva um arquivo de áudio e retorna o caminho relativo."""
     if file and allowed_file(file.filename):
-        # Criar nome de arquivo seguro e único
         filename = secure_filename(file.filename)
-        # Adicionar um identificador único para evitar sobrescrever arquivos
+        # Adicionar um prefixo único para evitar conflitos de nome
         unique_filename = f"{uuid.uuid4().hex}_{filename}"
         
-        # Garantir que o diretório existe
-        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        # Garantir que o diretório de upload existe
+        upload_dir = os.path.join('static', 'uploads', 'audio')
+        os.makedirs(upload_dir, exist_ok=True)
         
         # Caminho completo para salvar o arquivo
-        filepath = os.path.join(UPLOAD_FOLDER, unique_filename)
+        file_path = os.path.join(upload_dir, unique_filename)
         
         # Salvar o arquivo
-        file.save(filepath)
+        file.save(file_path)
         
-        # Retornar caminho relativo para armazenar no banco de dados
-        return filepath, file.content_length
+        # Retornar o caminho relativo e o tamanho do arquivo
+        return file_path, os.path.getsize(file_path)
+    
     return None, 0
 
-# Decorador para verificar se o usuário é administrador
 def admin_required(f):
-    @wraps(f)
+    """Decorator para requerer permissão de admin."""
+    @login_required
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or not current_user.is_admin:
+        if not current_user.is_admin:
             abort(403)  # Acesso proibido
         return f(*args, **kwargs)
+    
+    decorated_function.__name__ = f.__name__
     return decorated_function
 
 @bp.route('/')
 def home():
+    # Se o usuário já estiver logado, redireciona para o dashboard
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
     return render_template('home.html')
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
+    # Se o usuário já estiver logado, redireciona para o dashboard
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
     
     form = RegistrationForm()
     if form.validate_on_submit():
-        # Verificar se este é o primeiro usuário (será administrador)
+        from werkzeug.security import generate_password_hash
+        
+        # Verificar se é o primeiro usuário para definir como admin
         is_first_user = User.query.count() == 0
         
         user = User(
-            username=form.username.data, 
+            username=form.username.data,
             email=form.email.data,
-            is_admin=is_first_user  # Primeiro usuário será admin
+            is_admin=is_first_user  # O primeiro usuário será admin
         )
         user.set_password(form.password.data)
+        
         db.session.add(user)
         db.session.commit()
         
-        flash('Sua conta foi criada! Agora você pode entrar.', 'success')
+        flash('Sua conta foi criada! Você já pode entrar.', 'success')
         return redirect(url_for('main.login'))
     
     return render_template('register.html', form=form)
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
+    # Se o usuário já estiver logado, redireciona para o dashboard
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
     
@@ -219,7 +232,7 @@ def edit_composition(composition_id):
         if audio_file:
             if audio_file.content_length > MAX_CONTENT_LENGTH:
                 flash('Arquivo de áudio excede o limite de 3MB!', 'danger')
-                return render_template('composition_form.html', form=form, title='Editar Composição')
+                return render_template('composition_form.html', form=form, title='Editar Composição', composition=composition)
             
             # Remover arquivo antigo se existir
             if composition.audio_file and os.path.exists(composition.audio_file):
@@ -236,7 +249,7 @@ def edit_composition(composition_id):
                 composition.audio_file_size = file_size
             else:
                 flash('Tipo de arquivo não permitido. Use apenas arquivos MP3.', 'danger')
-                return render_template('composition_form.html', form=form, title='Editar Composição')
+                return render_template('composition_form.html', form=form, title='Editar Composição', composition=composition)
             
         db.session.commit()
         flash('Sua composição foi atualizada!', 'success')
@@ -255,7 +268,7 @@ def edit_composition(composition_id):
             if genre_obj:
                 form.genre.data = str(genre_obj.id)
     
-    return render_template('composition_form.html', form=form, title='Editar Composição')
+    return render_template('composition_form.html', form=form, title='Editar Composição', composition=composition)
 
 @bp.route('/composition/<int:composition_id>/delete', methods=['POST'])
 @login_required

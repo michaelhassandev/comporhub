@@ -29,6 +29,7 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_pre_ping": True,
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["MAX_CONTENT_LENGTH"] = 3 * 1024 * 1024  # Limite de 3MB para uploads
 
 # Initialize extensions with app
 db.init_app(app)

@@ -78,17 +78,32 @@
                     <div class="mb-3">
                         {{ form.audio_file.label(class="form-label") }}
                         {% if form.audio_file.errors %}
-                            {{ form.audio_file(class="form-control is-invalid") }}
+                            {{ form.audio_file(class="form-control is-invalid", id="audioFileInput") }}
                             <div class="invalid-feedback">
                                 {% for error in form.audio_file.errors %}
                                     {{ error }}
                                 {% endfor %}
                             </div>
                         {% else %}
-                            {{ form.audio_file(class="form-control") }}
+                            {{ form.audio_file(class="form-control", id="audioFileInput") }}
                         {% endif %}
                         <div class="form-text">
                             Upload apenas de arquivos MP3. Tamanho máximo: 3MB.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3" id="audioPreviewContainer" style="display: none;">
+                        <label class="form-label text-neon-pink">
+                            <i class="fas fa-headphones me-2"></i>Prévia do Áudio
+                        </label>
+                        <div class="card bg-dark p-3">
+                            <audio controls id="audioPreview" class="w-100">
+                                Seu navegador não suporta o elemento de áudio.
+                            </audio>
+                            <div class="text-muted small mt-2">
+                                <span id="audioFileName"></span> - 
+                                <span id="audioFileSize"></span>
+                            </div>
                         </div>
                     </div>
                     
@@ -105,4 +120,73 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const audioFileInput = document.getElementById('audioFileInput');
+        const audioPreview = document.getElementById('audioPreview');
+        const audioPreviewContainer = document.getElementById('audioPreviewContainer');
+        const audioFileName = document.getElementById('audioFileName');
+        const audioFileSize = document.getElementById('audioFileSize');
+        
+        // Função para formatar o tamanho do arquivo em KB ou MB
+        function formatFileSize(bytes) {
+            if (bytes < 1024 * 1024) {
+                return (bytes / 1024).toFixed(2) + ' KB';
+            } else {
+                return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+            }
+        }
+        
+        // Escutar por mudanças no input de arquivo
+        audioFileInput.addEventListener('change', function() {
+            // Esconder o player de áudio se nenhum arquivo for selecionado
+            if (!this.files || !this.files[0]) {
+                audioPreviewContainer.style.display = 'none';
+                audioPreview.src = '';
+                return;
+            }
+            
+            const file = this.files[0];
+            
+            // Verificar se é um arquivo MP3
+            if (file.type !== 'audio/mpeg') {
+                alert('Por favor, selecione apenas arquivos MP3!');
+                this.value = ''; // Limpar o input
+                audioPreviewContainer.style.display = 'none';
+                return;
+            }
+            
+            // Verificar o tamanho (3MB = 3 * 1024 * 1024 bytes)
+            if (file.size > 3 * 1024 * 1024) {
+                alert('O arquivo excede o limite de 3MB!');
+                this.value = ''; // Limpar o input
+                audioPreviewContainer.style.display = 'none';
+                return;
+            }
+            
+            // Criar URL para o arquivo e configurar o player
+            const fileURL = URL.createObjectURL(file);
+            audioPreview.src = fileURL;
+            
+            // Mostrar informações do arquivo
+            audioFileName.textContent = file.name;
+            audioFileSize.textContent = formatFileSize(file.size);
+            
+            // Mostrar o container de prévia
+            audioPreviewContainer.style.display = 'block';
+        });
+        
+        // Verificar se já existe um arquivo carregado (no caso de edição)
+        {% if composition and composition.audio_file %}
+            // Mostrar o player de prévia apenas se já houver um arquivo
+            audioPreviewContainer.style.display = 'block';
+            audioPreview.src = "{{ url_for('main.get_audio', composition_id=composition.id) }}";
+            audioFileName.textContent = "Arquivo atual";
+            audioFileSize.textContent = "{{ (composition.audio_file_size / 1024)|round|int }} KB";
+        {% endif %}
+    });
+</script>
 {% endblock %}
