@@ -13,6 +13,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_admin = db.Column(db.Boolean, default=False)  # Flag para administrador
     compositions = db.relationship('Composition', backref='composer', lazy='dynamic')
     
     def set_password(self, password):
@@ -24,12 +25,22 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f'<User {self.username}>'
 
+class Genre(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    description = db.Column(db.Text)
+    compositions = db.relationship('Composition', backref='genre_info', lazy='dynamic')
+    
+    def __repr__(self):
+        return f'<Genre {self.name}>'
+
 class Composition(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     music_name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
-    genre = db.Column(db.String(50))
+    genre = db.Column(db.String(50))  # Manter para compatibilidade
+    genre_id = db.Column(db.Integer, db.ForeignKey('genre.id'))  # Nova relação com tabela de gêneros
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

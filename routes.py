@@ -1,11 +1,21 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
-from models import User, Composition
-from forms import RegistrationForm, LoginForm, CompositionForm
+from models import User, Composition, Genre
+from forms import RegistrationForm, LoginForm, CompositionForm, GenreForm, UserAdminForm
 from sqlalchemy import desc
+from functools import wraps
 
 bp = Blueprint('main', __name__)
+
+# Decorador para verificar se o usuário é administrador
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            abort(403)  # Acesso proibido
+        return f(*args, **kwargs)
+    return decorated_function
 
 @bp.route('/')
 def home():
@@ -136,3 +146,103 @@ def search():
         compositions = []
     
     return render_template('dashboard.html', compositions=compositions, search_query=query)
+
+# Rotas de Administração
+@bp.route('/admin')
+@login_required
+@admin_required
+def admin_dashboard():
+    return render_template('admin/dashboard.html')
+
+# Gerenciamento de Gêneros
+@bp.route('/admin/generos')
+@login_required
+@admin_required
+def genre_list():
+    genres = Genre.query.order_by(Genre.name).all()
+    return render_template('admin/genre_list.html', genres=genres)
+
+@bp.route('/admin/generos/novo', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def new_genre():
+    form = GenreForm()
+    if form.validate_on_submit():
+        genre = Genre(
+            name=form.name.data,
+            description=form.description.data
+        )
+        db.session.add(genre)
+        db.session.commit()
+        flash('Gênero adicionado com sucesso!', 'success')
+        return redirect(url_for('main.genre_list'))
+    
+    return render_template('admin/genre_form.html', form=form, title='Novo Gênero')
+
+@bp.route('/admin/generos/<int:genre_id>/editar', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_genre(genre_id):
+    genre = Genre.query.get_or_404(genre_id)
+    form = GenreForm(obj=genre)
+    form._obj = genre  # Para a validação de nome único
+    
+    if form.validate_on_submit():
+        genre.name = form.name.data
+        genre.description = form.description.data
+        db.session.commit()
+        flash('Gênero atualizado com sucesso!', 'success')
+        return redirect(url_for('main.genre_list'))
+    
+    return render_template('admin/genre_form.html', form=form, title='Editar Gênero')
+
+@bp.route('/admin/generos/<int:genre_id>/excluir', methods=['POST'])
+@login_required
+@admin_required
+def delete_genre(genre_id):
+    genre = Genre.query.get_or_404(genre_id)
+    
+    # Verifica se existem composições usando este gênero
+    if genre.compositions.count() > 0:
+        flash('Não é possível excluir este gênero porque existem composições que o utilizam.', 'danger')
+    else:
+        db.session.delete(genre)
+        db.session.commit()
+        flash('Gênero excluído com sucesso!', 'success')
+    
+    return redirect(url_for('main.genre_list'))
+
+# Gerenciamento de Usuários
+@bp.route('/admin/usuarios')
+@login_required
+@admin_required
+def user_list():
+    users = User.query.order_by(User.username).all()
+    return render_template('admin/user_list.html', users=users)
+
+@bp.route('/admin/usuarios/<int:user_id>/editar', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_user(user_id):
+    user = User.query.get_or_404(user_id)
+    
+    # Prevenir auto-demoção de administrador
+    if user.id == current_user.id and user.is_admin:
+        form = UserAdminForm(obj=user)
+        form.is_admin.render_kw = {'disabled': 'disabled'}
+    else:
+        form = UserAdminForm(obj=user)
+    
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.email = form.email.data
+        
+        # Não permitir que o admin atual remova seus próprios privilégios
+        if not (user.id == current_user.id and user.is_admin):
+            user.is_admin = form.is_admin.data
+        
+        db.session.commit()
+        flash('Usuário atualizado com sucesso!', 'success')
+        return redirect(url_for('main.user_list'))
+    
+    return render_template('admin/user_form.html', form=form, user=user, title='Editar Usuário')
