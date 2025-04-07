@@ -1,0 +1,316 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Root Variables for Color Scheme */
+:root {
+    --neon-green: #00ff80;
+    --neon-pink: #ff00aa;
+    --dark-gray: #222222;
+    --darker-gray: #1a1a1a;
+    --light-gray: #aaaaaa;
+    --white: #ffffff;
+    --success: #00cc66;
+    --danger: #ff4d4d;
+    --warning: #ffcc00;
+    --info: #33ccff;
+}
+
+/* General Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--darker-gray);
+    color: var(--white);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navigation */
+.navbar {
+    background-color: var(--dark-gray);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: var(--neon-green);
+}
+
+.nav-link {
+    color: var(--white) !important;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: var(--neon-pink) !important;
+}
+
+/* Buttons */
+.btn-neon-green {
+    background-color: var(--neon-green);
+    color: var(--dark-gray);
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-neon-green:hover {
+    background-color: #00cc66;
+    color: var(--dark-gray);
+    box-shadow: 0 0 15px rgba(0, 255, 128, 0.5);
+}
+
+.btn-neon-pink {
+    background-color: var(--neon-pink);
+    color: var(--white);
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-neon-pink:hover {
+    background-color: #cc0080;
+    color: var(--white);
+    box-shadow: 0 0 15px rgba(255, 0, 170, 0.5);
+}
+
+.btn-outline-light {
+    border-color: var(--light-gray);
+    color: var(--white);
+}
+
+.btn-outline-light:hover {
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
+}
+
+/* Cards */
+.card {
+    background-color: var(--dark-gray);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--white);
+}
+
+.card-body {
+    color: var(--white);
+}
+
+.card-footer {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Authentication Cards */
+.auth-card {
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+/* Form Styling */
+.form-card {
+    background-color: var(--dark-gray);
+}
+
+.form-control, .form-select {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: var(--white);
+    border-color: var(--neon-green);
+    box-shadow: 0 0 0 0.25rem rgba(0, 255, 128, 0.25);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-label {
+    color: var(--white);
+    font-weight: 500;
+}
+
+.form-text {
+    color: var(--light-gray);
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.8em;
+}
+
+.bg-neon-green {
+    background-color: var(--neon-green);
+    color: var(--dark-gray);
+}
+
+.bg-neon-pink {
+    background-color: var(--neon-pink);
+    color: var(--white);
+}
+
+/* Text Colors */
+.text-neon-green {
+    color: var(--neon-green) !important;
+}
+
+.text-neon-pink {
+    color: var(--neon-pink) !important;
+}
+
+/* Feature Cards on Home Page */
+.feature-card {
+    padding: 2rem;
+    background-color: var(--dark-gray);
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+/* Composition Cards */
+.composition-card {
+    background-color: var(--dark-gray);
+    border-radius: 12px;
+    border-left: 4px solid var(--neon-pink);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+    height: 100%;
+}
+
+.composition-card:hover {
+    transform: translateY(-5px);
+}
+
+.composition-card .card-title {
+    color: var(--white);
+    font-weight: 600;
+}
+
+.composition-card .music-name {
+    color: var(--neon-green);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.composition-card .description-preview {
+    color: var(--light-gray);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Detail Cards */
+.detail-card {
+    background-color: var(--dark-gray);
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.detail-card .music-name {
+    color: var(--neon-green);
+    font-weight: 500;
+}
+
+.info-card {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.info-card .list-group-item {
+    background-color: transparent;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    padding: 0.75rem 1rem;
+}
+
+/* Breadcrumbs */
+.breadcrumb-item a {
+    color: var(--neon-pink);
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: var(--light-gray);
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    color: var(--light-gray);
+}
+
+/* Empty State */
+.empty-state {
+    padding: 3rem 0;
+}
+
+.empty-illustration {
+    width: 200px;
+    height: 150px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Home Page SVG Animation */
+.home-image svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--dark-gray);
+    padding: 1.5rem 0;
+    margin-top: auto;
+}
+
+/* Modal Styling */
+.modal-content {
+    background-color: var(--dark-gray);
+    color: var(--white);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .detail-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .feature-card {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}

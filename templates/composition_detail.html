@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ composition.title }} - Composer Hub{% endblock %}
+
+{% block content %}
+<div class="composition-detail">
+    <div class="detail-header mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.dashboard') }}">My Compositions</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ composition.title }}</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="text-white mb-0">{{ composition.title }}</h1>
+            <div class="btn-group">
+                <a href="{{ url_for('main.edit_composition', composition_id=composition.id) }}" class="btn btn-neon-green">
+                    <i class="fas fa-edit me-2"></i>Edit
+                </a>
+                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="fas fa-trash me-2"></i>Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card detail-card mb-4">
+                <div class="card-body">
+                    <h4 class="music-name mb-3">
+                        <i class="fas fa-music me-2 text-neon-pink"></i>
+                        {{ composition.music_name }}
+                    </h4>
+                    
+                    <div class="composition-meta mb-4">
+                        {% if composition.genre %}
+                            <span class="badge bg-neon-green mb-2 me-2">{{ composition.genre }}</span>
+                        {% endif %}
+                        <span class="badge bg-secondary mb-2 me-2">
+                            <i class="far fa-calendar-alt me-1"></i> Created: {{ composition.created_at.strftime('%b %d, %Y') }}
+                        </span>
+                        <span class="badge bg-secondary mb-2">
+                            <i class="fas fa-clock me-1"></i> Updated: {{ composition.updated_at.strftime('%b %d, %Y') }}
+                        </span>
+                    </div>
+                    
+                    <div class="description-section">
+                        <h5 class="text-neon-green mb-3">Description</h5>
+                        <div class="description-content">
+                            {% if composition.description %}
+                                {{ composition.description | nl2br }}
+                            {% else %}
+                                <p class="text-muted fst-italic">No description provided.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card bg-dark info-card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-neon-pink"><i class="fas fa-info-circle me-2"></i>Composition Info</h5>
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Title:</span>
+                            <span>{{ composition.title }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Music Name:</span>
+                            <span>{{ composition.music_name }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Genre:</span>
+                            <span>{{ composition.genre or 'Not specified' }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Created:</span>
+                            <span>{{ composition.created_at.strftime('%b %d, %Y') }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Last Updated:</span>
+                            <span>{{ composition.updated_at.strftime('%b %d, %Y') }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete "{{ composition.title }}"? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('main.delete_composition', composition_id=composition.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

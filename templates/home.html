@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Composer Hub - Manage Your Musical Compositions{% endblock %}
+
+{% block content %}
+<div class="row align-items-center py-5">
+    <div class="col-lg-6">
+        <h1 class="display-4 fw-bold text-white">Your Music, <span class="text-neon-green">Organized</span></h1>
+        <p class="lead text-white">A platform for composers to store, manage, and organize their musical compositions in one place.</p>
+        <div class="d-flex flex-wrap gap-2 mt-4">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.dashboard') }}" class="btn btn-neon-green btn-lg">Go to Dashboard</a>
+                <a href="{{ url_for('main.new_composition') }}" class="btn btn-neon-pink btn-lg">Create New Composition</a>
+            {% else %}
+                <a href="{{ url_for('main.register') }}" class="btn btn-neon-green btn-lg">Get Started</a>
+                <a href="{{ url_for('main.login') }}" class="btn btn-outline-light btn-lg">Login</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-6 text-center">
+        <div class="home-image">
+            <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg" class="img-fluid">
+                <!-- Musical notes and symbols -->
+                <path d="M100,150 Q150,50 200,150 T300,150" stroke="#f0f" fill="none" stroke-width="3"/>
+                <circle cx="100" cy="150" r="15" fill="#0f0"/>
+                <circle cx="200" cy="150" r="15" fill="#f0f"/>
+                <circle cx="300" cy="150" r="15" fill="#0f0"/>
+
+                <!-- Music sheet lines -->
+                <line x1="50" y1="200" x2="450" y2="200" stroke="#888" stroke-width="2"/>
+                <line x1="50" y1="220" x2="450" y2="220" stroke="#888" stroke-width="2"/>
+                <line x1="50" y1="240" x2="450" y2="240" stroke="#888" stroke-width="2"/>
+                <line x1="50" y1="260" x2="450" y2="260" stroke="#888" stroke-width="2"/>
+                <line x1="50" y1="280" x2="450" y2="280" stroke="#888" stroke-width="2"/>
+
+                <!-- Music notes -->
+                <g transform="translate(100, 200)">
+                    <ellipse cx="0" cy="0" rx="10" ry="8" transform="rotate(-20)" fill="#0f0"/>
+                    <line x1="10" y1="0" x2="10" y2="-50" stroke="#0f0" stroke-width="2"/>
+                    <path d="M10,-50 C20,-55 30,-45 30,-35" stroke="#0f0" fill="none" stroke-width="2"/>
+                </g>
+
+                <g transform="translate(200, 240)">
+                    <ellipse cx="0" cy="0" rx="10" ry="8" transform="rotate(-20)" fill="#f0f"/>
+                    <line x1="10" y1="0" x2="10" y2="-50" stroke="#f0f" stroke-width="2"/>
+                    <path d="M10,-50 C20,-55 30,-45 30,-35" stroke="#f0f" fill="none" stroke-width="2"/>
+                </g>
+
+                <g transform="translate(300, 220)">
+                    <ellipse cx="0" cy="0" rx="10" ry="8" transform="rotate(-20)" fill="#0f0"/>
+                    <line x1="10" y1="0" x2="10" y2="-50" stroke="#0f0" stroke-width="2"/>
+                    <path d="M10,-50 C20,-55 30,-45 30,-35" stroke="#0f0" fill="none" stroke-width="2"/>
+                </g>
+
+                <g transform="translate(400, 260)">
+                    <ellipse cx="0" cy="0" rx="10" ry="8" transform="rotate(-20)" fill="#f0f"/>
+                    <line x1="10" y1="0" x2="10" y2="-50" stroke="#f0f" stroke-width="2"/>
+                    <path d="M10,-50 C20,-55 30,-45 30,-35" stroke="#f0f" fill="none" stroke-width="2"/>
+                </g>
+            </svg>
+        </div>
+    </div>
+</div>
+
+<div class="row my-5 text-center text-white">
+    <h2 class="mb-4">Why Choose <span class="text-neon-pink">Composer Hub</span>?</h2>
+    
+    <div class="col-md-4 mb-4">
+        <div class="feature-card">
+            <i class="fas fa-music fa-3x mb-3 text-neon-green"></i>
+            <h3>Organize Your Compositions</h3>
+            <p>Keep all your musical works in one place with detailed information and easy searching.</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="feature-card">
+            <i class="fas fa-tasks fa-3x mb-3 text-neon-pink"></i>
+            <h3>Track Your Progress</h3>
+            <p>Monitor your creative journey and see how your composition portfolio grows over time.</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="feature-card">
+            <i class="fas fa-mobile-alt fa-3x mb-3 text-neon-green"></i>
+            <h3>Access Anywhere</h3>
+            <p>Our responsive design allows you to manage your compositions from any device.</p>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-5 mb-3">
+    <h2 class="text-white">Ready to organize your musical creations?</h2>
+    {% if not current_user.is_authenticated %}
+    <a href="{{ url_for('main.register') }}" class="btn btn-neon-pink btn-lg mt-3">Join Now</a>
+    {% else %}
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-neon-green btn-lg mt-3">Go to Your Dashboard</a>
+    {% endif %}
+</div>
+{% endblock %}

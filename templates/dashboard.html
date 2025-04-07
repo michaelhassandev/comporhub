@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Composer Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="text-white">My Compositions</h1>
+    <a href="{{ url_for('main.new_composition') }}" class="btn btn-neon-green">
+        <i class="fas fa-plus me-2"></i>New Composition
+    </a>
+</div>
+
+<div class="search-bar mb-4">
+    <form action="{{ url_for('main.search') }}" method="GET" class="d-flex">
+        <input 
+            type="text" 
+            name="q" 
+            class="form-control me-2" 
+            placeholder="Search compositions..." 
+            value="{{ search_query if search_query else '' }}"
+        >
+        <button type="submit" class="btn btn-neon-pink">
+            <i class="fas fa-search"></i>
+        </button>
+    </form>
+</div>
+
+{% if compositions %}
+    <div class="row">
+        {% for composition in compositions %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="composition-card">
+                    <div class="card-body">
+                        <h3 class="card-title text-truncate">{{ composition.title }}</h3>
+                        <p class="music-name">{{ composition.music_name }}</p>
+                        
+                        <div class="mb-3">
+                            {% if composition.genre %}
+                                <span class="badge bg-neon-green">{{ composition.genre }}</span>
+                            {% endif %}
+                            <span class="badge bg-secondary">
+                                <i class="far fa-calendar-alt me-1"></i>
+                                {{ composition.created_at.strftime('%b %d, %Y') }}
+                            </span>
+                        </div>
+
+                        <p class="description-preview">
+                            {{ composition.description[:100] ~ '...' if composition.description and composition.description|length > 100 else composition.description or 'No description provided.' }}
+                        </p>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <a href="{{ url_for('main.composition_detail', composition_id=composition.id) }}" class="btn btn-sm btn-outline-light">
+                                <i class="fas fa-eye me-1"></i>View
+                            </a>
+                            <div>
+                                <a href="{{ url_for('main.edit_composition', composition_id=composition.id) }}" class="btn btn-sm btn-outline-light me-1">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button 
+                                    class="btn btn-sm btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal{{ composition.id }}"
+                                >
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delete Confirmation Modal -->
+                <div class="modal fade" id="deleteModal{{ composition.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirm Deletion</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete "{{ composition.title }}"? This action cannot be undone.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <form action="{{ url_for('main.delete_composition', composition_id=composition.id) }}" method="POST">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state text-center py-5">
+        <svg class="empty-illustration mb-3" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+            <rect x="50" y="20" width="100" height="100" rx="10" fill="#333" stroke="#f0f" stroke-width="2"/>
+            <line x1="70" y1="50" x2="130" y2="50" stroke="#0f0" stroke-width="2"/>
+            <line x1="70" y1="70" x2="130" y2="70" stroke="#0f0" stroke-width="2"/>
+            <line x1="70" y1="90" x2="130" y2="90" stroke="#0f0" stroke-width="2"/>
+            <circle cx="160" cy="120" r="20" fill="#f0f" opacity="0.5"/>
+            <circle cx="40" cy="40" r="15" fill="#0f0" opacity="0.5"/>
+        </svg>
+        
+        {% if search_query %}
+            <h3 class="text-white">No compositions found matching "{{ search_query }}"</h3>
+            <p class="text-muted">Try a different search query or clear your search</p>
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-neon-green mt-2">
+                <i class="fas fa-times me-2"></i>Clear Search
+            </a>
+        {% else %}
+            <h3 class="text-white">You don't have any compositions yet</h3>
+            <p class="text-muted">Start creating your musical portfolio today!</p>
+            <a href="{{ url_for('main.new_composition') }}" class="btn btn-neon-pink mt-3">
+                <i class="fas fa-plus me-2"></i>Create Your First Composition
+            </a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}
