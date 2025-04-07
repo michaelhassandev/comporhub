@@ -1,11 +1,13 @@
 import os
 import logging
+import re
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from flask_login import LoginManager
 from werkzeug.middleware.proxy_fix import ProxyFix
+from markupsafe import escape, Markup
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -21,6 +23,17 @@ login_manager = LoginManager()
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # needed for url_for to generate with https
+
+# Adiciona o filtro nl2br para converter quebras de linha em <br>
+@app.template_filter('nl2br')
+def nl2br(value):
+    if value is None:
+        return ''
+    
+    # Convertemos quebras de linha em <br> para exibição HTML
+    text = escape(value)
+    result = text.replace('\n', Markup('<br>\n'))
+    return result
 
 # Configure the database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
