@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Painel Administrativo{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <h1 class="mb-4">Painel Administrativo</h1>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-music fa-3x mb-3 text-primary"></i>
+                    <h3>Gerenciar Gêneros</h3>
+                    <p>Adicione, edite ou remova os gêneros musicais disponíveis no sistema.</p>
+                    <a href="{{ url_for('main.genre_list') }}" class="btn btn-primary">Gerenciar Gêneros</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                    <h3>Gerenciar Usuários</h3>
+                    <p>Administre os usuários da plataforma e seus privilégios.</p>
+                    <a href="{{ url_for('main.user_list') }}" class="btn btn-primary">Gerenciar Usuários</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x mb-3 text-primary"></i>
+                    <h3>Estatísticas</h3>
+                    <p>Visualize estatísticas e métricas sobre o uso da plataforma.</p>
+                    <button class="btn btn-secondary" disabled>Em breve</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h2 class="h4 mb-0">Visão Geral do Sistema</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total de usuários cadastrados
+                            <span class="badge bg-primary rounded-pill">{{ total_users }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total de composições
+                            <span class="badge bg-primary rounded-pill">{{ total_compositions }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total de gêneros musicais
+                            <span class="badge bg-primary rounded-pill">{{ total_genres }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

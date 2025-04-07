@@ -34,6 +34,18 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('main.dashboard') }}">Painel</a>
                     </li>
+                    {% if current_user.is_admin %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                            Administração
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard') }}">Painel Admin</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.genre_list') }}">Gerenciar Gêneros</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.user_list') }}">Gerenciar Usuários</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
                     {% endif %}
                 </ul>
                 <div class="d-flex">
@@ -45,6 +57,10 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ url_for('main.dashboard') }}">Painel</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('main.new_composition') }}">Nova Composição</a></li>
+                            {% if current_user.is_admin %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard') }}">Administração</a></li>
+                            {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('main.logout') }}">Sair</a></li>
                         </ul>

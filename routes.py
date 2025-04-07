@@ -28,10 +28,18 @@ def register():
     
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
+        # Verificar se este é o primeiro usuário (será administrador)
+        is_first_user = User.query.count() == 0
+        
+        user = User(
+            username=form.username.data, 
+            email=form.email.data,
+            is_admin=is_first_user  # Primeiro usuário será admin
+        )
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+        
         flash('Sua conta foi criada! Agora você pode entrar.', 'success')
         return redirect(url_for('main.login'))
     
@@ -77,9 +85,17 @@ def new_composition():
             title=form.title.data,
             music_name=form.music_name.data,
             description=form.description.data,
-            genre=form.genre.data,
             user_id=current_user.id
         )
+        
+        # Se um gênero foi selecionado, adicione-o
+        if form.genre.data and form.genre.data != '':
+            # Salvar o gênero original para compatibilidade
+            genre_obj = Genre.query.get(int(form.genre.data))
+            if genre_obj:
+                composition.genre = genre_obj.name
+                composition.genre_id = genre_obj.id
+        
         db.session.add(composition)
         db.session.commit()
         flash('Sua composição foi criada!', 'success')
@@ -107,7 +123,18 @@ def edit_composition(composition_id):
         composition.title = form.title.data
         composition.music_name = form.music_name.data
         composition.description = form.description.data
-        composition.genre = form.genre.data
+        
+        # Se um gênero foi selecionado, atualize-o
+        if form.genre.data and form.genre.data != '':
+            # Salvar o gênero original para compatibilidade
+            genre_obj = Genre.query.get(int(form.genre.data))
+            if genre_obj:
+                composition.genre = genre_obj.name
+                composition.genre_id = genre_obj.id
+        else:
+            composition.genre = None
+            composition.genre_id = None
+            
         db.session.commit()
         flash('Sua composição foi atualizada!', 'success')
         return redirect(url_for('main.composition_detail', composition_id=composition.id))
@@ -115,7 +142,15 @@ def edit_composition(composition_id):
         form.title.data = composition.title
         form.music_name.data = composition.music_name
         form.description.data = composition.description
-        form.genre.data = composition.genre
+        
+        # Se tem um genre_id, use-o; caso contrário, tente usar o campo genre
+        if composition.genre_id:
+            form.genre.data = str(composition.genre_id)
+        elif composition.genre:
+            # Tente encontrar o gênero pelo nome para compatibilidade
+            genre_obj = Genre.query.filter_by(name=composition.genre).first()
+            if genre_obj:
+                form.genre.data = str(genre_obj.id)
     
     return render_template('composition_form.html', form=form, title='Editar Composição')
 
@@ -152,7 +187,15 @@ def search():
 @login_required
 @admin_required
 def admin_dashboard():
-    return render_template('admin/dashboard.html')
+    # Estatísticas para o dashboard
+    total_users = User.query.count()
+    total_compositions = Composition.query.count()
+    total_genres = Genre.query.count()
+    
+    return render_template('admin/dashboard.html', 
+                          total_users=total_users, 
+                          total_compositions=total_compositions,
+                          total_genres=total_genres)
 
 # Gerenciamento de Gêneros
 @bp.route('/admin/generos')

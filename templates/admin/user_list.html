@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Usuários{% endblock %}
+
+{% block content %}
+<div class="user-list">
+    <h1 class="mb-4">Gerenciar Usuários</h1>
+    
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if users %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nome de Usuário</th>
+                            <th>Email</th>
+                            <th>Data de Registro</th>
+                            <th>Tipo</th>
+                            <th>Composições</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                {% if user.is_admin %}
+                                <span class="badge bg-danger">Administrador</span>
+                                {% else %}
+                                <span class="badge bg-info">Usuário</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.compositions.count() }}</td>
+                            <td>
+                                <a href="{{ url_for('main.edit_user', user_id=user.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-users fa-3x mb-3 text-muted"></i>
+                <p class="lead">Nenhum usuário encontrado.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="mt-3">
+        <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Voltar para o Painel
+        </a>
+    </div>
+</div>
+{% endblock %}

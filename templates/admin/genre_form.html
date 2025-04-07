@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="genre-form">
+    <h1 class="mb-4">{{ title }}</h1>
+    
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    {{ form.name.label(class="form-label") }}
+                    {% if form.name.errors %}
+                        {{ form.name(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.name.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.name(class="form-control") }}
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.description.label(class="form-label") }}
+                    {% if form.description.errors %}
+                        {{ form.description(class="form-control is-invalid", rows=5) }}
+                        <div class="invalid-feedback">
+                            {% for error in form.description.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.description(class="form-control", rows=5) }}
+                    {% endif %}
+                    <div class="form-text">Uma breve descrição sobre este gênero musical.</div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('main.genre_list') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i> Cancelar
+                    </a>
+                    {{ form.submit(class="btn btn-neon-pink") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
