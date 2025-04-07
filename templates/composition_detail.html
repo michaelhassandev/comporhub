@@ -37,10 +37,10 @@
                         {% if composition.genre %}
                             <span class="badge bg-neon-green mb-2 me-2">{{ composition.genre }}</span>
                         {% endif %}
-                        <span class="badge bg-secondary mb-2 me-2">
+                        <span class="badge bg-secondary mb-2 me-2" title="Data e hora de criação: {{ composition.created_at.strftime('%d/%m/%Y %H:%M') }}">
                             <i class="far fa-calendar-alt me-1"></i> Criado em: {{ composition.created_at.strftime('%d/%m/%Y') }}
                         </span>
-                        <span class="badge bg-secondary mb-2">
+                        <span class="badge bg-secondary mb-2" title="Data e hora da última atualização: {{ composition.updated_at.strftime('%d/%m/%Y %H:%M') }}">
                             <i class="fas fa-clock me-1"></i> Atualizado em: {{ composition.updated_at.strftime('%d/%m/%Y') }}
                         </span>
                     </div>
@@ -96,12 +96,18 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span class="fw-bold">Criado em:</span>
-                            <span>{{ composition.created_at.strftime('%d/%m/%Y') }}</span>
+                            <span>{{ composition.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span class="fw-bold">Última Atualização:</span>
-                            <span>{{ composition.updated_at.strftime('%d/%m/%Y') }}</span>
+                            <span>{{ composition.updated_at.strftime('%d/%m/%Y %H:%M') }}</span>
                         </li>
+                        {% if composition.audio_file %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Arquivo de Áudio:</span>
+                            <span>{{ (composition.audio_file_size / 1024)|round|int }} KB</span>
+                        </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

@@ -11,19 +11,48 @@
 </div>
 
 <div class="search-bar mb-4">
-    <form action="{{ url_for('main.search') }}" method="GET" class="d-flex">
-        <input 
-            type="text" 
-            name="q" 
-            class="form-control me-2" 
-            placeholder="Buscar composições..." 
-            value="{{ search_query if search_query else '' }}"
-        >
-        <button type="submit" class="btn btn-neon-pink">
-            <i class="fas fa-search"></i>
-        </button>
+    <form action="{{ url_for('main.search') }}" method="GET">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        class="form-control" 
+                        placeholder="Buscar por título, música, descrição ou gênero..." 
+                        value="{{ search_query if search_query else '' }}"
+                    >
+                    <button type="submit" class="btn btn-neon-pink">
+                        <i class="fas fa-search me-1"></i> Buscar
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex">
+                    <label for="sort" class="form-label me-2 text-white d-flex align-items-center mb-0">
+                        <i class="fas fa-sort me-1"></i> Ordenar por:
+                    </label>
+                    <select name="sort" id="sort" class="form-select" onchange="this.form.submit()">
+                        <option value="updated_at" {% if request.args.get('sort') == 'updated_at' or not request.args.get('sort') %}selected{% endif %}>Última atualização</option>
+                        <option value="created_at" {% if request.args.get('sort') == 'created_at' %}selected{% endif %}>Data de criação</option>
+                        <option value="title" {% if request.args.get('sort') == 'title' %}selected{% endif %}>Título</option>
+                        <option value="music_name" {% if request.args.get('sort') == 'music_name' %}selected{% endif %}>Nome da música</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
+
+{% if search_query %}
+<div class="alert alert-info mb-4">
+    <i class="fas fa-info-circle me-2"></i>
+    Mostrando resultados para: <strong>"{{ search_query }}"</strong>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-sm btn-outline-dark float-end">
+        <i class="fas fa-times me-1"></i>Limpar Busca
+    </a>
+</div>
+{% endif %}
 
 {% if compositions %}
     <div class="row">
@@ -38,9 +67,13 @@
                             {% if composition.genre %}
                                 <span class="badge bg-neon-green">{{ composition.genre }}</span>
                             {% endif %}
-                            <span class="badge bg-secondary">
+                            <span class="badge bg-secondary" title="Data de criação: {{ composition.created_at.strftime('%d/%m/%Y %H:%M') }}">
                                 <i class="far fa-calendar-alt me-1"></i>
                                 {{ composition.created_at.strftime('%d/%m/%Y') }}
+                            </span>
+                            <span class="badge bg-secondary" title="Última atualização: {{ composition.updated_at.strftime('%d/%m/%Y %H:%M') }}">
+                                <i class="fas fa-clock me-1"></i>
+                                {{ composition.updated_at.strftime('%d/%m/%Y') }}
                             </span>
                             {% if composition.audio_file %}
                                 <span class="badge bg-neon-pink">

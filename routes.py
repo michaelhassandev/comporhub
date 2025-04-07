@@ -105,7 +105,22 @@ def logout():
 @bp.route('/dashboard')
 @login_required
 def dashboard():
-    compositions = current_user.compositions.order_by(desc(Composition.updated_at)).all()
+    sort_by = request.args.get('sort', 'updated_at')  # Padrão: ordenar por data de atualização
+    
+    # Base query
+    base_query = current_user.compositions
+    
+    # Aplicar ordenação
+    if sort_by == 'title':
+        base_query = base_query.order_by(Composition.title)
+    elif sort_by == 'music_name':
+        base_query = base_query.order_by(Composition.music_name)
+    elif sort_by == 'created_at':
+        base_query = base_query.order_by(desc(Composition.created_at))
+    else:  # default: updated_at
+        base_query = base_query.order_by(desc(Composition.updated_at))
+    
+    compositions = base_query.all()
     return render_template('dashboard.html', compositions=compositions)
 
 @bp.route('/composition/new', methods=['GET', 'POST'])
@@ -266,13 +281,40 @@ def delete_composition(composition_id):
 @login_required
 def search():
     query = request.args.get('q', '')
+    sort_by = request.args.get('sort', 'updated_at')  # Padrão: ordenar por data de atualização
+    
     if query:
-        compositions = Composition.query.filter(
-            Composition.user_id == current_user.id,
-            (Composition.title.ilike(f'%{query}%') | 
-             Composition.music_name.ilike(f'%{query}%') | 
-             Composition.description.ilike(f'%{query}%'))
-        ).order_by(desc(Composition.updated_at)).all()
+        # Consulta base - filtrar para o usuário atual
+        base_query = Composition.query.filter(Composition.user_id == current_user.id)
+        
+        # Aplicar filtro de busca
+        search_filter = (
+            Composition.title.ilike(f'%{query}%') | 
+            Composition.music_name.ilike(f'%{query}%') | 
+            Composition.description.ilike(f'%{query}%')
+        )
+        
+        # Buscar também pelo nome do gênero
+        genre_ids = []
+        genres = Genre.query.filter(Genre.name.ilike(f'%{query}%')).all()
+        if genres:
+            genre_ids = [g.id for g in genres]
+            search_filter = search_filter | Composition.genre_id.in_(genre_ids)
+        
+        # Aplicar o filtro de busca
+        base_query = base_query.filter(search_filter)
+        
+        # Aplicar ordenação
+        if sort_by == 'title':
+            base_query = base_query.order_by(Composition.title)
+        elif sort_by == 'music_name':
+            base_query = base_query.order_by(Composition.music_name)
+        elif sort_by == 'created_at':
+            base_query = base_query.order_by(desc(Composition.created_at))
+        else:  # default: updated_at
+            base_query = base_query.order_by(desc(Composition.updated_at))
+        
+        compositions = base_query.all()
     else:
         compositions = []
     
