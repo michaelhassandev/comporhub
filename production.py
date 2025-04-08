@@ -5,8 +5,20 @@ It uses Waitress as the WSGI server and includes security-related configurations
 """
 
 import os
+import sys
+import logging
 from waitress import serve
+from waitress.adjustments import Adjustments
 from app import app
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 
 # Production-specific settings
 app.config['DEBUG'] = False
@@ -35,15 +47,29 @@ def run_production_server():
         response.headers['X-XSS-Protection'] = '1; mode=block'
         return response
     
-    # Start Waitress server
-    print("Starting production server...")
-    serve(
-        app,
-        host='0.0.0.0',  # Listen on all available network interfaces
-        port=8080,       # Default production port
-        threads=4,       # Number of worker threads
-        url_scheme='http'
-    )
+    # Configure Waitress server
+    try:
+        port = int(os.environ.get('PORT', 8080))
+        logging.info(f"Starting production server on port {port}...")
+        
+        # Configure Waitress with proper error handling
+        serve(
+            app,
+            host='0.0.0.0',
+            port=port,
+            threads=int(os.environ.get('WAITRESS_THREADS', 4)),
+            url_scheme='https',
+            channel_timeout=300,
+            cleanup_interval=30,
+            connection_limit=1000,
+            log_socket_errors=True,
+            max_request_header_size=262144,
+            max_request_body_size=1073741824,
+            retry_startup=True
+        )
+    except Exception as e:
+        logging.error(f"Failed to start production server: {str(e)}")
+        sys.exit(1)
 
 if __name__ == '__main__':
     run_production_server()
