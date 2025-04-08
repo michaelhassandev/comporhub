@@ -8,8 +8,8 @@ from werkzeug.utils import secure_filename
 import werkzeug
 
 from app import db
-from models import User, Composition, Genre
-from forms import RegistrationForm, LoginForm, CompositionForm, GenreForm, UserAdminForm
+from models import User, Composition, Genre, Singer
+from forms import RegistrationForm, LoginForm, CompositionForm, GenreForm, UserAdminForm, SingerForm
 
 # Criar um blueprint para todas as rotas
 bp = Blueprint('main', __name__)
@@ -440,3 +440,94 @@ def edit_user(user_id):
         return redirect(url_for('main.user_list'))
     
     return render_template('admin/user_form.html', form=form, user=user, title='Editar Usuário')
+# Rotas para gerenciamento de cantores
+@bp.route('/singers')
+@login_required
+def singer_list():
+    singers = Singer.query.filter_by(user_id=current_user.id).order_by(Singer.name).all()
+    
+    # Verificar por exclusividades prestes a expirar (próximos 15 dias)
+    expiring_soon = []
+    for singer in singers:
+        if singer.exclusivity_status == "vence em breve":
+            expiring_soon.append(singer)
+    
+    return render_template('singer_list.html', singers=singers, expiring_soon=expiring_soon)
+
+@bp.route('/singers/new', methods=['GET', 'POST'])
+@login_required
+def new_singer():
+    form = SingerForm(user=current_user)
+    
+    if form.validate_on_submit():
+        singer = Singer(
+            name=form.name.data,
+            phone=form.phone.data,
+            email=form.email.data,
+            notes=form.notes.data,
+            exclusive_until=form.exclusive_until.data,
+            composition_id=int(form.composition.data),
+            user_id=current_user.id
+        )
+        
+        db.session.add(singer)
+        db.session.commit()
+        flash('Cantor adicionado com sucesso!', 'success')
+        return redirect(url_for('main.singer_list'))
+    
+    return render_template('singer_form.html', form=form, title='Novo Cantor')
+
+@bp.route('/singers/<int:singer_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_singer(singer_id):
+    singer = Singer.query.get_or_404(singer_id)
+    
+    # Verificar se o usuário tem permissão para editar
+    if singer.user_id != current_user.id:
+        abort(403)
+    
+    form = SingerForm(obj=singer, user=current_user)
+    
+    if form.validate_on_submit():
+        singer.name = form.name.data
+        singer.phone = form.phone.data
+        singer.email = form.email.data
+        singer.notes = form.notes.data
+        singer.exclusive_until = form.exclusive_until.data
+        singer.composition_id = int(form.composition.data)
+        
+        db.session.commit()
+        flash('Informações do cantor atualizadas com sucesso!', 'success')
+        return redirect(url_for('main.singer_list'))
+    elif request.method == 'GET':
+        form.composition.data = str(singer.composition_id)
+    
+    return render_template('singer_form.html', form=form, title='Editar Cantor', singer=singer)
+
+@bp.route('/singers/<int:singer_id>/delete', methods=['POST'])
+@login_required
+def delete_singer(singer_id):
+    singer = Singer.query.get_or_404(singer_id)
+    
+    # Verificar se o usuário tem permissão para excluir
+    if singer.user_id != current_user.id:
+        abort(403)
+    
+    db.session.delete(singer)
+    db.session.commit()
+    flash('Cantor excluído com sucesso!', 'success')
+    return redirect(url_for('main.singer_list'))
+
+@bp.route('/composition/<int:composition_id>/singers')
+@login_required
+def composition_singers(composition_id):
+    composition = Composition.query.get_or_404(composition_id)
+    
+    # Verificar se o usuário tem permissão para visualizar
+    if composition.user_id != current_user.id:
+        abort(403)
+    
+    singers = Singer.query.filter_by(composition_id=composition_id).order_by(Singer.name).all()
+    return render_template('composition_singers.html', composition=composition, singers=singers)
+
+# Adicionar este método ao fim do arquivo routes.py
