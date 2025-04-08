@@ -1,13 +1,18 @@
 import os
 import logging
-import re
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from flask_login import LoginManager
 from werkzeug.middleware.proxy_fix import ProxyFix
+import pymysql
 from markupsafe import escape, Markup
+
+# Importando a configuração MySQL
+from mysql_config import MYSQL_DATABASE_URI
+
+# Registrando o PyMySQL como driver para MySQL
+pymysql.install_as_MySQLdb()
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -35,14 +40,17 @@ def nl2br(value):
     result = text.replace('\n', Markup('<br>\n'))
     return result
 
-# Configure the database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+# Configure database - use MySQL
+app.config["SQLALCHEMY_DATABASE_URI"] = MYSQL_DATABASE_URI
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["MAX_CONTENT_LENGTH"] = 3 * 1024 * 1024  # Limite de 3MB para uploads
+
+# Log de conexão
+logging.info(f"Conectando ao banco de dados: {MYSQL_DATABASE_URI.replace('://', '://**:**@')}")
 
 # Initialize extensions with app
 db.init_app(app)
