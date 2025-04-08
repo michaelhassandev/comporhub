@@ -34,6 +34,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('main.dashboard') }}">Painel</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.singer_list') }}">Cantores</a>
+                    </li>
                     {% if current_user.is_admin %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
@@ -57,6 +60,7 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ url_for('main.dashboard') }}">Painel</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('main.new_composition') }}">Nova Composição</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.singer_list') }}">Cantores Interessados</a></li>
                             {% if current_user.is_admin %}
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard') }}">Administração</a></li>

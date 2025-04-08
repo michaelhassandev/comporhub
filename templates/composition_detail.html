@@ -14,6 +14,9 @@
         <div class="d-flex justify-content-between align-items-center">
             <h1 class="text-white mb-0">{{ composition.title }}</h1>
             <div class="btn-group">
+                <a href="{{ url_for('main.composition_singers', composition_id=composition.id) }}" class="btn btn-neon-pink">
+                    <i class="fas fa-microphone me-2"></i>Cantores Interessados
+                </a>
                 <a href="{{ url_for('main.edit_composition', composition_id=composition.id) }}" class="btn btn-neon-green">
                     <i class="fas fa-edit me-2"></i>Editar
                 </a>
@@ -95,6 +98,10 @@
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span class="fw-bold">Última Atualização:</span>
                             <span>{{ composition.updated_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Cantores Interessados:</span>
+                            <span class="badge bg-neon-pink rounded-pill">{{ composition.singers.count() }}</span>
                         </li>
                         {% if composition.audio_file %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ title }}</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    {{ form.name.label(class="form-label") }}
+                    {{ form.name(class="form-control") }}
+                    {% for error in form.name.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.composition.label(class="form-label") }}
+                    {{ form.composition(class="form-select") }}
+                    {% for error in form.composition.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.phone.label(class="form-label") }}
+                    {{ form.phone(class="form-control", placeholder="(00) 00000-0000") }}
+                    {% for error in form.phone.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                    <div class="form-text">Número de telefone com DDD para contato via WhatsApp.</div>
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control", type="email") }}
+                    {% for error in form.email.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.exclusive_until.label(class="form-label") }}
+                    {{ form.exclusive_until(class="form-control", type="date") }}
+                    {% for error in form.exclusive_until.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                    <div class="form-text">Data até quando o cantor tem exclusividade para gravar esta composição.</div>
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.notes.label(class="form-label") }}
+                    {{ form.notes(class="form-control", rows=4) }}
+                    {% for error in form.notes.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                    <div class="form-text">Observações importantes sobre o cantor ou acordos feitos.</div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('main.singer_list') }}" class="btn btn-secondary">Cancelar</a>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

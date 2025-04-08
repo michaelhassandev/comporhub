@@ -5,9 +5,14 @@
 {% block content %}
 <div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
     <h1 class="text-white">Minhas Composições</h1>
-    <a href="{{ url_for('main.new_composition') }}" class="btn btn-neon-green">
-        <i class="fas fa-plus me-2"></i>Nova Composição
-    </a>
+    <div>
+        <a href="{{ url_for('main.singer_list') }}" class="btn btn-neon-pink me-2">
+            <i class="fas fa-microphone me-2"></i>Cantores Interessados
+        </a>
+        <a href="{{ url_for('main.new_composition') }}" class="btn btn-neon-green">
+            <i class="fas fa-plus me-2"></i>Nova Composição
+        </a>
+    </div>
 </div>
 
 <div class="search-bar mb-4">
@@ -80,6 +85,9 @@
                                     <i class="fas fa-music me-1"></i>Áudio
                                 </span>
                             {% endif %}
+                            <span class="badge bg-info" title="Cantores Interessados">
+                                <i class="fas fa-microphone me-1"></i>{{ composition.singers.count() }}
+                            </span>
                         </div>
 
                         <p class="description-preview">
@@ -91,6 +99,9 @@
                                 <i class="fas fa-eye me-1"></i>Ver
                             </a>
                             <div>
+                                <a href="{{ url_for('main.composition_singers', composition_id=composition.id) }}" class="btn btn-sm btn-outline-light me-1" title="Cantores Interessados">
+                                    <i class="fas fa-microphone"></i>
+                                </a>
                                 <a href="{{ url_for('main.edit_composition', composition_id=composition.id) }}" class="btn btn-sm btn-outline-light me-1">
                                     <i class="fas fa-edit"></i>
                                 </a>
