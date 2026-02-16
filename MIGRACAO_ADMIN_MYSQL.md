@@ -11,6 +11,7 @@ ALTER TABLE user ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;
 -- Definir o primeiro usuário como administrador
 UPDATE user SET is_admin = TRUE ORDER BY id LIMIT 1;
 
+
 -- Criar tabela de gêneros
 CREATE TABLE genre (
   id INT AUTO_INCREMENT PRIMARY KEY,
